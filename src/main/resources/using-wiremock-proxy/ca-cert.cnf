@@ -1,0 +1,109 @@
+# Example OpenSSL configuration for generating a certificate authority capable of signing other
+# certificates. This is required for the Wiremock proxy to properly intercept requests made by
+# the third-party API to return your mock data.
+
+HOME            = .
+RANDFILE        = $ENV::HOME/.rnd
+
+####################################################################
+[ ca ]
+
+# This is the default section defining where certificates are stored after signing and additional
+# configuration for the generated certificates.
+default_ca = CA_default
+
+[ CA_default ]
+
+# base_dir is not a directive. This is a variable we can reuse within the file.
+base_dir      = ${HOME}/certs
+new_certs_dir = $base_dir
+
+certificate   = $base_dir/cacert.pem
+private_key   = $base_dir/cakey.pem
+database      = $base_dir/index.txt
+serial        = $base_dir/serial.txt
+
+# default to 10 years excluding leap days.
+default_days  = 3650
+
+# 'yes' requires a unique subject for each certificate request. We'll set this to 'no', because
+# this shouldn't matter for our purposes.
+unique_subject = no
+
+# default message digest algorithm.
+default_md       = sha256
+
+# length of time in days before a new certificate revocation list should be generated.
+default_crl_days = 30
+
+# OpenSSL will reorder the DN attributes. Set to 'yes' to preserve the order of the attributes
+# passed during the signing process.
+preserve = no
+
+# leave the e-mail out of the DN.
+email_in_dn     = no
+
+# honor the extensions requested by keys being signed by the generated certificate authority.
+copy_extensions = copy
+
+# configuration section for extensions to be added to the generated certificate authority. It is
+# in this section where we specify the key signing extension so Wiremock can use this CA when
+# intercepting requests.
+x509_extensions = ca_extensions
+
+####################################################################
+[ req ]
+
+# the size of the generated certificate
+default_bits       = 4096
+
+# the default name of the generated certificate key.
+default_keyfile    = cakey.pem
+
+# configuration section defining the DN attributes and default values.
+distinguished_name = ca_distinguished_name
+
+# configuration section for extensions to be added to the generated certificate authority. It is
+# in this section where we specify the key signing extension so Wiremock can use this CA when
+# intercepting requests.
+x509_extensions = ca_extensions
+
+# what string encoding to accept
+string_mask = utf8only
+
+####################################################################
+[ ca_distinguished_name ]
+
+countryName         = Country Name (2 letter code)
+countryName_default = US
+
+stateOrProvinceName         = State or Province Name (full name)
+stateOrProvinceName_default = Nevada
+
+localityName                = Locality Name (eg, city)
+localityName_default        = Reno
+
+organizationName            = Organization Name (eg, company)
+organizationName_default    = None-ya Bidness, Inc.
+
+organizationalUnitName         = Organizational Unit (eg, division)
+organizationalUnitName_default = Mind-ya Bidness
+
+commonName         = Common Name (e.g. server FQDN or YOUR name)
+commonName_default = Unit Testing
+
+emailAddress         = Email Address
+emailAddress_default = noreply@example.com
+
+####################################################################
+[ ca_extensions ]
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always, issuer
+
+# CA:true enables certificate authority functionality in the generated certificate. This value
+# is required.
+basicConstraints       = critical, CA:true
+
+#
+keyUsage               = keyCertSign, cRLSign
