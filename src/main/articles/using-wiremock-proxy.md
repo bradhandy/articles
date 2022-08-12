@@ -21,8 +21,9 @@ authority.
 
 We will use OpenSSL to generate our certificate. This software package is available on most, if
 not all, Linux distributions, and on Mac. OpenSSL can be installed on Windows
-[independently](https://wiki.openssl.org/index.php/Binaries) or Git for Windows comes with an
-OpenSSL binary.
+[independently](https://wiki.openssl.org/index.php/Binaries) or
+[Git for Windows](https://gitforwindows.org/) comes with an OpenSSL binary according answers to this
+[StackOverflow question](https://stackoverflow.com/questions/50625283/how-to-install-openssl-in-windows-10).
 
 ### Configuration
 
@@ -31,4 +32,20 @@ stored in a configuration file within the OpenSSL installation. However, we will
 own copy to ensure the `keySign` capability is added to the certificate authority.
 
 You can find an example configuration on [Github](https://www.github.com/) within the [example
-project](https://www.github.com/. 
+project](https://github.com/bradhandy/articles/blob/main/src/main/resources/using-wiremock-proxy/ca-cert.cnf).
+
+### Creating the Certificate
+
+Using the example configuration we can generate a new certificate authority:
+```shell
+cd /path/to/certificate/storage/directory
+openssl req -x509 -config [path-to-configuration]/ca-cert.cnf -newkey rsa:4096 -sha256 -nodes -out cacert.pem -outform PEM
+```
+
+The command generates an unencrypted (`-nodes`) self-signed certificate (`-x509`) using a new
+4096-bit RSA key (`-newkey rsa:4096`). We are not encrypting the certificate because this
+certificate should only be used for testing. If you want to generate a new certificate authority
+for other uses, then encrypting the key would be wise.
+
+The new certificate is stored in a file called `cacert.pem` in the directory where you ran the
+command or the path you prepended to the name of the file in the command.
