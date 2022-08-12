@@ -32,7 +32,7 @@ stored in a configuration file within the OpenSSL installation. However, we will
 own copy to ensure the `keySign` capability is added to the certificate authority.
 
 You can find an example configuration on [Github](https://www.github.com/) within the [example
-project](https://github.com/bradhandy/articles/blob/main/src/main/resources/using-wiremock-proxy/ca-cert.cnf).
+project](https://github.com/bradhandy/articles/blob/main/src/test/resources/using-wiremock-proxy/ca-cert.cnf).
 
 ### Creating the Certificate
 
